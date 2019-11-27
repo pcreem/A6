@@ -22,15 +22,29 @@ module.exports = (app, passport) => {
     res.redirect('/signin')
   }
 
-  // 如果使用者訪問首頁，就導向 /restaurants 的頁面
+  const authenticatedUser = (req, res, next) => {
+    if (req.isAuthenticated()) {
+      if (req.user.id == req.params.id) {
+        return next()
+      } else {
+        req.flash('error_messages', 'Authentication error!')
+        return res.redirect(`/profile/${req.user.id}`)
+      }
+
+    }
+  }
+
   app.get('/', authenticated, (req, res) => res.redirect('restaurants'))
   app.get('/restaurants', authenticated, restController.getRestaurants)
   app.get('/restaurants/:id', authenticated, restController.getRestaurant)
 
+  app.get('/profile/:id', authenticatedUser, userController.getProfile)
+  app.get('/profile/:id/edit', authenticatedUser, userController.editProfile)
+  app.put('/profile/:id', authenticatedUser, upload.single('image'), userController.putProfile)
+
   app.post('/comments', authenticated, commentController.postComment)
   app.delete('/comments/:id', authenticatedAdmin, commentController.deleteComment)
 
-  // 連到 /admin 頁面就轉到 /admin/restaurants
   app.get('/admin', authenticatedAdmin, (req, res) => res.redirect('/admin/restaurants'))
   app.get('/admin/restaurants', authenticatedAdmin, adminController.getRestaurants)
   app.get('/admin/restaurants/create', authenticatedAdmin, adminController.createRestaurant)

@@ -4,15 +4,12 @@ const bcrypt = require('bcrypt-nodejs')
 const db = require('../models')
 const User = db.User
 
-// setup passport strategy
 passport.use(new LocalStrategy(
-  // customize user field
   {
     usernameField: 'email',
     passwordField: 'password',
     passReqToCallback: true
   },
-  // authenticate user
   (req, username, password, cb) => {
     User.findOne({ where: { email: username } }).then(user => {
       if (!user) return cb(null, false, req.flash('error_messages', '帳號或密碼輸入錯誤'))
@@ -22,7 +19,6 @@ passport.use(new LocalStrategy(
   }
 ))
 
-// serialize and deserialize user
 passport.serializeUser((user, cb) => {
   cb(null, user.id)
 })

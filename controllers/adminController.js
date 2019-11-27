@@ -1,5 +1,5 @@
 const imgur = require('imgur-node-api')
-const IMGUR_CLIENT_ID = 'de317f1c8cd5c62'
+const IMGUR_CLIENT_ID = process.env.IMGUR_CLIENT_ID
 const fs = require('fs')
 const db = require('../models')
 const Restaurant = db.Restaurant
@@ -66,7 +66,8 @@ const adminController = {
   editRestaurant: (req, res) => {
     Category.findAll().then(categories => {
       return Restaurant.findByPk(req.params.id).then(restaurant => {
-        return res.render('admin/create', { categories: categories, restaurant: restaurant
+        return res.render('admin/create', {
+          categories: categories, restaurant: restaurant
         })
       })
     })
